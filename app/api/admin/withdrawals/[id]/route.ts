@@ -2,13 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { jwtVerify } from 'jose';
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
-  const withdrawalId = params.id;
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  // Await the params in Next.js 15
+  const { id } = await params;
+  const withdrawalId = id;
 
   try {
     const { action, amount } = await req.json();
-
     const token = req.cookies.get('token')?.value;
+
     if (!token) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
@@ -42,7 +44,6 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     }
 
     const recipientId = existing.profile.user.id;
-
     let updated;
 
     if (action === 'approve') {
