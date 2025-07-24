@@ -29,20 +29,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: 'Profile not found' }, { status: 404 })
   }
   
-  // TODO: handle file upload if needed
-  // let savedFileName: string | null = null
-  
-  // 📝 Create the withdrawal request
   const newRequest = await prisma.withdrawalRequest.create({
     data: {
       profileId: profile.id,
       amount,
       reason,
-      // attachment: savedFileName, // Removed this line
     },
   })
   
-  // 🔔 Notify all admins
   const adminUsers = await prisma.user.findMany({
     where: {
       profile: {
