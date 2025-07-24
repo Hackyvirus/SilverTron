@@ -1,0 +1,351 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String @id @default(cuid())
+  email        String @unique
+  passwordHash String
+
+  profile               Profile?
+  sentMessages          ChatMessage[]      @relation("SentMessages")
+  receivedMessages      ChatMessage[]      @relation("ReceivedMessages")
+  aiChatHistories       AiChatHistory[]
+  onboardingRequest     OnboardingRequest?
+  sentNotifications     Notification[]     @relation("SentNotifications")
+  receivedNotifications Notification[]     @relation("ReceivedNotifications")
+}
+
+model Profile {
+  id                     String    @id @default(cuid())
+  userId                 String    @unique
+  email                  String    @unique
+  fullName               String
+  phoneNumber            String
+  role                   String
+  onboarded              Boolean   @default(false)
+  passportNumber         String?
+  currentAddress         String?
+  permanentAddress       String?
+  alternateContactNumber String?
+  dateOfBirth            DateTime?
+  panNumber              String?
+  aadhaarNumber          String?
+  educationDetails       String?
+  bloodGroup             String?
+  photoFileName          String?
+  share                  Int?
+  accountNumber          String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+
+  equityPerformances   EquityPerformance[]
+  optionsPerformances  OptionsPerformance[]
+  intradayPerformances IntradayPerformance[]
+  totalPerformances    TotalPerformance[]
+  withdrawalRequests   WithdrawalRequest[]
+}
+
+model WithdrawalRequest {
+  id         String    @id @default(cuid())
+  profileId  String
+  amount     Float
+  reason     String?
+  status     String    @default("pending") 
+  reviewedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  profile Profile @relation(fields: [profileId], references: [id])
+}
+
+model ChatMessage {
+  id         String   @id @default(uuid())
+  senderId   String
+  receiverId String
+  message    String
+  timestamp  DateTime @default(now())
+
+  receiver User @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  sender   User @relation("SentMessages", fields: [senderId], references: [id])
+}
+
+model AiChatHistory {
+  id        String   @id @default(uuid())
+  userId    String
+  role      String
+  message   String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model OnboardingRequest {
+  id                     String    @id @default(uuid())
+  userId                 String    @unique
+  email                  String
+  fullName               String
+  passportNumber         String?
+  currentAddress         String?
+  permanentAddress       String?
+  alternateContactNumber String?
+  primaryContactNumber   String?
+  dateOfBirth            DateTime?
+  panNumber              String?
+  aadhaarNumber          String?
+  educationDetails       String?
+  bloodGroup             String?
+  photoFileName          String?
+  share                  Int?
+  accountNumber          String?
+  status                 String    @default("pending")
+  submittedAt            DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  type      String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  recipientId String
+  senderId    String
+
+  recipient User @relation("ReceivedNotifications", fields: [recipientId], references: [id])
+  sender    User @relation("SentNotifications", fields: [senderId], references: [id])
+}
+
+enum AccountType {
+  Eq
+  Op
+  In
+  Total
+}
+
+model EquityPerformance {
+  id            String      @id @default(uuid())
+  profileId     String
+  recordedAt    DateTime    @default(now())
+  accountNumber Int
+  accountType   AccountType 
+
+  orders Int
+  fills  Int
+  qty    Int
+
+  startCash       Float
+  startUnrealized Float
+  startBalance    Float
+
+  gross  Float
+  comm   Float
+  ecnFee Float
+  sec    Float
+  orf    Float
+  cat    Float
+  taf    Float
+  nfa    Float
+  nscc   Float
+  acc    Float
+  clr    Float
+  misc   Float
+
+  tradeFees Float
+  net       Float
+
+  feeDailyInterest Float
+  feeDividends     Float
+  feeMisc          Float
+  feeShortInterest Float
+  stockLocate      Float
+  techFees         Float
+  adjFees          Float
+  adjNet           Float
+
+  unrealizedDelta Float
+  total           Float
+  cashInOut       Float
+  transfer        Float
+  endCash         Float
+  endUnrealized   Float
+  endBalance      Float
+
+  percentage Float?
+  empShare   Float?
+  tranAmount Float?
+
+  profile Profile @relation(fields: [profileId], references: [id])
+}
+
+model OptionsPerformance {
+  id            String      @id @default(uuid())
+  profileId     String
+  recordedAt    DateTime    @default(now())
+  accountNumber Int
+  accountType   AccountType 
+  orders Int
+  fills  Int
+  qty    Int
+
+  startCash       Float
+  startUnrealized Float
+  startBalance    Float
+
+  gross  Float
+  comm   Float
+  ecnFee Float
+  sec    Float
+  orf    Float
+  cat    Float
+  taf    Float
+  nfa    Float
+  nscc   Float
+  acc    Float
+  clr    Float
+  misc   Float
+
+  tradeFees Float
+  net       Float
+
+  feeDailyInterest Float
+  feeDividends     Float
+  feeMisc          Float
+  feeShortInterest Float
+  stockLocate      Float
+  techFees         Float
+  adjFees          Float
+  adjNet           Float
+
+  unrealizedDelta Float
+  total           Float
+  cashInOut       Float
+  transfer        Float
+  endCash         Float
+  endUnrealized   Float
+  endBalance      Float
+
+  percentage Float?
+  empShare   Float?
+  tranAmount Float?
+
+  profile Profile @relation(fields: [profileId], references: [id])
+}
+
+model IntradayPerformance {
+  id            String      @id @default(uuid())
+  profileId     String
+  recordedAt    DateTime    @default(now())
+  accountNumber Int
+  accountType   AccountType 
+
+  orders Int
+  fills  Int
+  qty    Int
+
+  startCash       Float
+  startUnrealized Float
+  startBalance    Float
+
+  gross  Float
+  comm   Float
+  ecnFee Float
+  sec    Float
+  orf    Float
+  cat    Float
+  taf    Float
+  nfa    Float
+  nscc   Float
+  acc    Float
+  clr    Float
+  misc   Float
+
+  tradeFees Float
+  net       Float
+
+  feeDailyInterest Float
+  feeDividends     Float
+  feeMisc          Float
+  feeShortInterest Float
+  stockLocate      Float
+  techFees         Float
+  adjFees          Float
+  adjNet           Float
+
+  unrealizedDelta Float
+  total           Float
+  cashInOut       Float
+  transfer        Float
+  endCash         Float
+  endUnrealized   Float
+  endBalance      Float
+
+  percentage Float?
+  empShare   Float?
+  tranAmount Float?
+
+  profile Profile @relation(fields: [profileId], references: [id])
+}
+
+model TotalPerformance {
+  id            String      @id @default(uuid())
+  profileId     String
+  recordedAt    DateTime    @default(now())
+  accountNumber Int
+  accountType   AccountType 
+
+  orders Int
+  fills  Int
+  qty    Int
+
+  startCash       Float
+  startUnrealized Float
+  startBalance    Float
+
+  gross  Float
+  comm   Float
+  ecnFee Float
+  sec    Float
+  orf    Float
+  cat    Float
+  taf    Float
+  nfa    Float
+  nscc   Float
+  acc    Float
+  clr    Float
+  misc   Float
+
+  tradeFees Float
+  net       Float
+
+  feeDailyInterest Float
+  feeDividends     Float
+  feeMisc          Float
+  feeShortInterest Float
+  stockLocate      Float
+  techFees         Float
+  adjFees          Float
+  adjNet           Float
+
+  unrealizedDelta Float
+  total           Float
+  cashInOut       Float
+  transfer        Float
+  endCash         Float
+  endUnrealized   Float
+  endBalance      Float
+
+  percentage Float?
+  empShare   Float?
+  tranAmount Float?
+
+  profile Profile @relation(fields: [profileId], references: [id])
+}
