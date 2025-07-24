@@ -176,15 +176,7 @@ const Register = () => {
                 Login
               </Link>
             </p>
-            <p>
-              Forgot your password?{' '}
-              <Link
-                href="/auth/user/forgot-password"
-                className={`text-[#1570EF] hover:underline ${isSubmitting ? 'pointer-events-none opacity-50' : ''}`}
-              >
-                Reset here
-              </Link>
-            </p>
+          
           </div>
         </form>
       </div>

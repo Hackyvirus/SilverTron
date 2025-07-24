@@ -112,14 +112,7 @@ const Login = () => {
               disabled={loading}
               required
             />
-            <div className="text-right mt-1">
-              <Link
-                href="/auth/user/forgot-password"
-                className={`text-sm text-[#1570EF] hover:underline ${loading ? 'pointer-events-none opacity-50' : ''}`}
-              >
-                Forgot Password?
-              </Link>
-            </div>
+            
           </div>
 
           {error && <p className="text-red-600 text-sm mb-2">{error}</p>}
