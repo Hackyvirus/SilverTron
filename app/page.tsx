@@ -112,7 +112,7 @@ export default function SilverTron() {
               <a href="#about" className="block text-white/90 hover:text-cyan-400 transition-colors">About</a>
               <a href="#reviews" className="block text-white/90 hover:text-cyan-400 transition-colors">Reviews</a>
               <button className="w-full bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-6 py-2 rounded-full">
-                Get Started
+                <Link href="/auth/user/register">User Dashboard</Link>
               </button>
             </div>
           </div>
